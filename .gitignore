@@ -1,3 +1,9 @@
+*.iml
+.idea/
+target/
+.DS_Store
+tomcat.*
+
 # Compiled class file
 *.class
 
