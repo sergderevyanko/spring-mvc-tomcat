@@ -39,6 +39,9 @@ public class ApplicationLauncher {
                 additionWebInfClasses.getAbsolutePath(), "/"));
         ctx.setResources(resources);
 
+        //required for tomcat 9
+        //tomcat 8 can work without this line
+        tomcat.getConnector();
         tomcat.start();
         tomcat.getServer().await();
     }
