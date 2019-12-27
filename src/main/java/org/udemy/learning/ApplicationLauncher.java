@@ -5,6 +5,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
+import org.apache.tomcat.util.scan.StandardJarScanFilter;
 
 import java.io.File;
 
@@ -24,6 +25,10 @@ public class ApplicationLauncher {
         tomcat.setPort(Integer.valueOf(webPort));
 
         StandardContext ctx = (StandardContext) tomcat.addWebapp("/", new File(webappDirLocation).getAbsolutePath());
+        StandardJarScanFilter jarScanFilter = new StandardJarScanFilter();
+        jarScanFilter.setPluggabilitySkip("mchange-commons-java*.jar");
+        jarScanFilter.setTldSkip("mchange-commons-java*.jar");
+        ctx.getJarScanner().setJarScanFilter(jarScanFilter);
         System.out.println("configuring app with basedir: " + new File("./" + webappDirLocation).getAbsolutePath());
 
         // Declare an alternative location for your "WEB-INF/classes" dir
