@@ -6,13 +6,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 @Configuration
+//xml based configuration can be imported as follow
+//@ImportResource({"classpath:hibernate5Configuration.xml"})
+@EnableTransactionManagement
 @PropertySource({ "classpath:hibernate-mysql.properties" })
 public class DataSourceConfiguration {
 
@@ -32,6 +38,7 @@ public class DataSourceConfiguration {
         return dataSource;
     }
 
+    @Bean
     public LocalSessionFactoryBean sessionFactory() throws PropertyVetoException {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
@@ -40,6 +47,14 @@ public class DataSourceConfiguration {
         return sessionFactory;
     }
 
+
+    @Bean
+    public PlatformTransactionManager hibernateTransactionManager() throws PropertyVetoException {
+        HibernateTransactionManager transactionManager
+                = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+        return transactionManager;
+    }
 
 
     private final Properties hibernateProperties() {
@@ -52,7 +67,8 @@ public class DataSourceConfiguration {
         // hibernateProperties.setProperty("hibernate.globally_quoted_identifiers", "true");
 
         // Envers properties
-        hibernateProperties.setProperty("org.hibernate.envers.audit_table_suffix", env.getProperty("envers.audit_table_suffix"));
+        hibernateProperties.setProperty("org.hibernate.envers.audit_table_suffix",
+                env.getProperty("hibernate.envers.audit_table_suffix", "audit"));
 
         return hibernateProperties;
     }
